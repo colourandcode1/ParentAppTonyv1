@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Text, Pressable, ScrollView, TextInput } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { CHILDREN, ALL_CHILDREN } from "./src/constants";
 import { styles } from "./src/styles";
@@ -45,6 +45,9 @@ const bottomNavRow = {
 };
 
 export default function App() {
+  const [locked, setLocked] = useState(true);
+  const [password, setPassword] = useState("");
+  const [pwError, setPwError] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [child, setChild] = useState(CHILDREN[0]);
   const [showChildSwitcher, setShowChildSwitcher] = useState(false);
@@ -84,6 +87,64 @@ export default function App() {
       scrollRef.current.scrollTo({ y: 0, animated: false });
     }
   };
+
+  const handleUnlock = () => {
+    if (password === "parentapp") {
+      setLocked(false);
+      setPwError(false);
+    } else {
+      setPwError(true);
+      setPassword("");
+    }
+  };
+
+  if (locked) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#E8ECF0", padding: 20 }}>
+        <StatusBar style="dark" />
+        <View style={styles.frame}>
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 32 }}>
+            <TextInput
+              value={password}
+              onChangeText={(t) => { setPassword(t); setPwError(false); }}
+              placeholder="Password"
+              secureTextEntry
+              onSubmitEditing={handleUnlock}
+              returnKeyType="go"
+              style={{
+                width: "100%",
+                borderWidth: 1.5,
+                borderColor: pwError ? "#E8735A" : "#E2E8F0",
+                borderRadius: 12,
+                paddingHorizontal: 16,
+                paddingVertical: 14,
+                fontSize: 16,
+                backgroundColor: "#fff",
+                marginBottom: 8,
+                color: "#1a1a1a",
+              }}
+            />
+            {pwError && (
+              <Text style={{ fontSize: 13, color: "#E8735A", marginBottom: 12, alignSelf: "flex-start" }}>Incorrect password. Try again.</Text>
+            )}
+            <Pressable
+              onPress={handleUnlock}
+              style={({ pressed }) => [{
+                width: "100%",
+                backgroundColor: pressed ? "#155a3d" : "#1B6B4A",
+                borderRadius: 12,
+                paddingVertical: 15,
+                alignItems: "center",
+                marginTop: 8,
+              }]}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "600", color: "#fff" }}>Sign in</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#E8ECF0", padding: 20 }}>
